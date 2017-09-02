@@ -1,0 +1,58 @@
+"""
+This algorithm is designed to solve https://projecteuler.net/problem=29
+
+This file accepts as input two values, a_upper and b_upper, and outputs the number of UNIQUE values of a^b
+where 2 <= a <= a_upper and 2 <= b <= b_upper 
+
+Instead of calculating large powers, which is expensive (especially a*b of them), it simply calculates
+a few and deduces the rest from there.
+The algorithm begins by calculating (a-1)*(b-1), which is the total number of powers that could be calculated.
+Then it tries to find (a,b) pairs that it knows will generate the same power as some other pair (a*,b*).
+It does this efficiently by taking advantage of the following properties:
+	1. x^(y*z) == (x^y)^z   (For the sake of this problem assume x, y and z are integers > 1, as 1 is a trivial case)
+	2. Following 1., if (x^y) is a valid value for a (as defined by the problem), then (x, y*z) is a pair to be discounted.
+From these two properties, it can be deduced that the only powers that need to be calculated are the ones that yield 
+values <= a_upper.
+"""
+# import time
+
+a_upper = int(input("Please enter the upper bound for the base: "))
+b_upper = int(input("Please enter the upper bound for the exponent: "))
+
+# start = time.perf_counter()
+# unique_pows = (a_upper - 1)*(b_upper - 1)
+# # This will never get near the upper bound for a, it should break way sooner
+# should_break = False
+# for base in range(2, a_upper + 1):
+# 	# This will never get near the upper bound for b, it should break way sooner
+# 	for exp in range(2, b_upper + 1):
+# 		current_pow = pow(base, exp)
+# 		if (current_pow > a_upper):
+# 			if (exp == 2):
+# 				should_break = True
+# 			break
+# 		print("Pows removed: ", (b_upper//exp) - 1, "; Base: ", base, "; Exp: ", exp)
+# 		unique_pows -= (b_upper//exp) - 1
+# 	if (should_break):
+# 		break
+# end = time.perf_counter();
+# print("Total unique solutions: ", unique_pows)
+# print("Total time to run this algorithm (in ms): ", (end - start)*1000)
+
+"""
+This is a less optimal, simpler solution.
+
+I am using this one for now because the above is not yet correct
+E.g. for a_upper = 9, b_upper = 9, the algorithm will miss the duplicates created by:
+	8^4 <=> 4^6
+	8^6 <=> 4^9
+Because the original value that WOULD have calculated these two as duplicates, 2^12, has
+an exponent of 12 which outside the original problem space.
+
+Still need to think of how to correct for this.
+"""
+dict = {} 
+for base in range(2, a_upper + 1):
+	for exp in range(2, b_upper + 1):
+		dict[pow(base, exp)] = True
+print("Total unique solutions: ", len(dict))
